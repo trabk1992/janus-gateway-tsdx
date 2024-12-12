@@ -64,6 +64,7 @@ class Plugin extends TransactionManager {
       return new Promise((resolve, reject) => {
         this.once('detach', resolve);
         this.sendWithTransaction({ janus: 'detach' }).catch(reject);
+        this.cleanup();
       });
     }
     return Promise.resolve();
@@ -89,6 +90,7 @@ class Plugin extends TransactionManager {
     return Promise.try(() => {
       msg = new JanusPluginMessage(msg.getPlainMessage(), this);
       if ('detached' === msg.get('janus')) {
+        console.log("processIncomeMessage-detached")
         return this.onDetached();
       }
       return this.defaultProcessIncomeMessage(msg);
