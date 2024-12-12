@@ -67,6 +67,7 @@ class VideoRoomPlugin extends MediaPlugin {
       janus: 'message',
       body: { request: 'unpublish' },
     }).then(response => {
+      console.log("sendWithTransaction-unpublish", response);
       this.closePeerConnection();
       return response;
     });
