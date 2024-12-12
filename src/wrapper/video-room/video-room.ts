@@ -71,6 +71,9 @@ export class VideoRoom {
     return this.plugin?.detach()
   }
 
+  hangup = ()=> {
+    return this.plugin?.hangup()
+  }
   private _onRoomJoined = (_: JoinInfo) => {};
 
   private _onLocalVideo = (_: MediaStream) => {};
