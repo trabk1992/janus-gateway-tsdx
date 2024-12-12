@@ -73,14 +73,10 @@ class VideoRoomPlugin extends MediaPlugin {
     });
   }
   detach() {
-    return this.sendWithTransaction({
-      janus: 'message',
-      body: { request: 'detach' },
-    }).then(response => {
-      console.log("sendWithTransaction-unpublish", response);
-      this.closePeerConnection();
-      return response;
-    });
+    return super.detach();
+  }
+  hangup() {
+    return super.hangup();
   }
   processIncomeMessage(message: JanusMessage) {
     return super.processIncomeMessage(message).then(result => {
