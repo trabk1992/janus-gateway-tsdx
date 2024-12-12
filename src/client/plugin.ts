@@ -89,6 +89,7 @@ class Plugin extends TransactionManager {
   processIncomeMessage(msg: JanusMessage): Promise<any> {
     return Promise.try(() => {
       msg = new JanusPluginMessage(msg.getPlainMessage(), this);
+      console.log("processIncomeMessage-msg", msg);
       if ('detached' === msg.get('janus')) {
         console.log("processIncomeMessage-detached")
         return this.onDetached();
