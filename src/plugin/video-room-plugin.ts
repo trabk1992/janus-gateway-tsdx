@@ -71,7 +71,10 @@ class VideoRoomPlugin extends MediaPlugin {
       return response;
     });
   }
-
+  detach() {
+    this.closePeerConnection();
+    return super.detach()
+  }
   processIncomeMessage(message: JanusMessage) {
     return super.processIncomeMessage(message).then(result => {
       if (!message.getPlainMessage()) {
