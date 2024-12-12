@@ -64,7 +64,6 @@ class Plugin extends TransactionManager {
       return new Promise((resolve, reject) => {
         this.once('detach', resolve);
         this.sendWithTransaction({ janus: 'detach' }).catch(reject);
-        this.cleanup();
       });
     }
     return Promise.resolve();
