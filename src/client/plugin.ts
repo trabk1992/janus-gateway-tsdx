@@ -73,6 +73,7 @@ class Plugin extends TransactionManager {
     if (this.session) {
       this.session = null;
       this.emit('detach');
+      this.cleanup()
     }
     return Promise.resolve();
   }

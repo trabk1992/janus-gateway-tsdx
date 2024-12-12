@@ -67,8 +67,15 @@ export class VideoRoom {
   unpublish = async () => {
     return this.plugin?.unpublish();
   };
-  detach = ()=>{
-    return this.plugin?.detach()
+  leave =async ()=>{
+    await this.plugin?.unpublish();
+    await this.plugin?.detach();
+    await this.session?.destroy()
+    await this.connection?.close();
+    this.connection = undefined;
+    this.session = undefined;
+    this.plugin = undefined;
+    this.joinInfo = undefined;
   }
 
   hangup = ()=> {
