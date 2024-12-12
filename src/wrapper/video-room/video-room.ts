@@ -67,6 +67,9 @@ export class VideoRoom {
   unpublish = async () => {
     return this.plugin?.unpublish();
   };
+  detach = ()=>{
+    return this.plugin?.detach()
+  }
 
   private _onRoomJoined = (_: JoinInfo) => {};
 
