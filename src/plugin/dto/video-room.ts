@@ -30,6 +30,7 @@ export interface RemoteVideo {
  *       "token" : "<invitation token, in case the room has an ACL; optional>"
  * }
  */
+
 export type JanusId = number | string;
 export interface JoinOptions {
   id?: JanusId;
@@ -48,4 +49,13 @@ export interface JoinInfo {
   id: JanusId;
   private_id: number;
   publishers: any[];
+}
+export interface JanusEvent {
+  janus: 'webrtcup' | 'media' | 'event';
+  mid?: string;
+  receiving?: boolean;
+  sender: JanusId;
+  session_id: JanusId;
+  type?: 'video' | 'audio';
+  jsep?: any;
 }

@@ -1,7 +1,7 @@
 import JanusPluginMessage from '../../client/misc/plugin-message';
 import Connection, { ConnectionOptions } from '../../client/connection';
 import { UserMediaResult } from '../../plugin/base/media-plugin';
-import { JoinInfo, JoinOptions, RemoteVideo } from '../../plugin/dto/video-room';
+import { JoinInfo, JoinOptions, RemoteVideo, JanusEvent } from '../../plugin/dto/video-room';
 import Client from '../../client/client';
 import Session from '../../client/session';
 import VideoRoomPlugin from '../../plugin/video-room-plugin';
@@ -28,7 +28,9 @@ export class VideoRoom {
     this.clientOptions = clientOptions;
     this.client = new Client(this.address, this.clientOptions, mediaDevices, webRTC);
   }
-
+  public onReceiveEvent(f: (e: JanusEvent) => void) {
+    this._onReceiveEvent = f;
+  }
   public onRoomJoined(f: (e: JoinInfo) => void) {
     this._onRoomJoined = f;
   }
@@ -67,20 +69,21 @@ export class VideoRoom {
   unpublish = async () => {
     return this.plugin?.unpublish();
   };
-  leave =async ()=>{
+  leave = async () => {
     await this.plugin?.unpublish();
     await this.plugin?.detach();
-    await this.session?.destroy()
+    await this.session?.destroy();
     await this.connection?.close();
     this.connection = undefined;
     this.session = undefined;
     this.plugin = undefined;
     this.joinInfo = undefined;
-  }
+  };
 
-  hangup = ()=> {
-    return this.plugin?.hangup()
-  }
+  hangup = () => {
+    return this.plugin?.hangup();
+  };
+  private _onReceiveEvent = (_: JanusEvent) => {};
   private _onRoomJoined = (_: JoinInfo) => {};
 
   private _onLocalVideo = (_: MediaStream) => {};
@@ -110,6 +113,10 @@ export class VideoRoom {
     //@ts-ignore
     this.plugin = await this.session?.attachPlugin(VideoRoomPlugin.NAME);
 
+    this.plugin?.on('event:received', (data: JanusEvent) => {
+      console.log('event:received', data);
+      this._onReceiveEvent(data);
+    });
     // Event when user accepts permissions.
     this.plugin?.on('consent-dialog:stop', (media: UserMediaResult) => {
       if (media.stream) this._onLocalVideo(media.stream);
@@ -127,6 +134,10 @@ export class VideoRoom {
     });
 
     // Event when remote participant left the room.
+    this.plugin?.on('videoroom-remote-feed:leaving', (feedId: number) => {
+      this._onLeaving(feedId);
+    });
+
     this.plugin?.on('videoroom-remote-feed:leaving', (feedId: number) => {
       this._onLeaving(feedId);
     });

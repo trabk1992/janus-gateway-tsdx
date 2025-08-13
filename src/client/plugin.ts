@@ -54,9 +54,8 @@ class Plugin extends TransactionManager {
     msg['handle_id'] = this.id;
     if (this.session) {
       return this.session.send(msg);
-    } else {
-      return Promise.reject(new Error('No active session.'));
     }
+    return Promise.reject(new Error('No active session.'));
   }
 
   detach(): Promise<any> {
@@ -73,7 +72,7 @@ class Plugin extends TransactionManager {
     if (this.session) {
       this.session = null;
       this.emit('detach');
-      this.cleanup()
+      this.cleanup();
     }
     return Promise.resolve();
   }
@@ -89,21 +88,21 @@ class Plugin extends TransactionManager {
   processIncomeMessage(msg: JanusMessage): Promise<any> {
     return Promise.try(() => {
       msg = new JanusPluginMessage(msg.getPlainMessage(), this);
-      console.log("processIncomeMessage-msg", msg);
+      // console.log('processIncomeMessage-msg', msg);
       if ('detached' === msg.get('janus')) {
-        console.log("processIncomeMessage-detached")
+        // console.log('processIncomeMessage-detached');
         return this.onDetached();
       }
       return this.defaultProcessIncomeMessage(msg);
     })
       .then(() => this.emit('message', msg))
-      .catch(error => this.emit('error', error));
+      .catch((error) => this.emit('error', error));
   }
 
   sendWithTransaction(options: any): Promise<any> {
     let transactionId = Transaction.generateRandomId();
     //@ts-ignore
-    let transaction = new Transaction(transactionId, msg => {
+    let transaction = new Transaction(transactionId, (msg) => {
       let errorMessage = msg.getError();
       if (!errorMessage) {
         return Promise.resolve(msg);
@@ -117,8 +116,8 @@ class Plugin extends TransactionManager {
     let sendPromise = this.sendSync(message, this);
 
     return new Promise((resolve, reject) => {
-      transaction.getPromise().catch(e => reject(e));
-      sendPromise.then(r => resolve(r)).catch(e => reject(e));
+      transaction.getPromise().catch((e) => reject(e));
+      sendPromise.then((r) => resolve(r)).catch((e) => reject(e));
     });
   }
 

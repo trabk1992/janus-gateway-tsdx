@@ -24,14 +24,14 @@ class VideoRoomPlugin extends MediaPlugin {
     this.joinInfo = info;
 
     return this.getUserMedia(constraints)
-      .then(stream => {
+      .then((stream) => {
         this.createPeerConnection({});
         //@ts-ignore
-        stream.getTracks().forEach(track => this.addTrack(track, stream));
+        stream.getTracks().forEach((track) => this.addTrack(track, stream));
       })
       .then(() => this.createOffer({}))
-      .then(jsep => this.configure(JANUS_VIDEOROOM_OPTIONS, jsep))
-      .then(resp => {
+      .then((jsep) => this.configure(JANUS_VIDEOROOM_OPTIONS, jsep))
+      .then((resp) => {
         const jsep = resp.get('jsep');
         if (jsep) {
           this.setRemoteSDP(jsep);
@@ -66,8 +66,8 @@ class VideoRoomPlugin extends MediaPlugin {
     return this.sendWithTransaction({
       janus: 'message',
       body: { request: 'unpublish' },
-    }).then(response => {
-      console.log("sendWithTransaction-unpublish", response);
+    }).then((response) => {
+      // console.log('sendWithTransaction-unpublish', response);
       this.closePeerConnection();
       return response;
     });
@@ -79,14 +79,14 @@ class VideoRoomPlugin extends MediaPlugin {
     return super.hangup();
   }
   processIncomeMessage(message: JanusMessage) {
-    return super.processIncomeMessage(message).then(result => {
+    return super.processIncomeMessage(message).then((result) => {
       if (!message.getPlainMessage()) {
         return;
       }
 
-      console.log('Received:', message);
-
       const plainMessage = message.getPlainMessage();
+      this.emit('event:received', plainMessage);
+
       const type = plainMessage.janus;
 
       switch (type) {
@@ -98,7 +98,6 @@ class VideoRoomPlugin extends MediaPlugin {
 
           let videoroom = pluginData.videoroom;
           this.handleRemotePublishers(pluginData.publishers).then(() => console.debug('Success handle publishers.'));
-
           switch (videoroom) {
             case 'attached':
               this.emit('videoroom-remote-feed:attached', { plainMessage });
