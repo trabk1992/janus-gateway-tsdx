@@ -70,10 +70,22 @@ export class VideoRoom {
     return this.plugin?.unpublish();
   };
   leave = async () => {
-    await this.plugin?.unpublish();
-    await this.plugin?.detach();
-    await this.session?.destroy();
-    await this.connection?.close();
+    try {
+      await this.plugin?.detach();
+    } catch (error) {
+      
+    }
+    try {
+      await this.session?.destroy();
+    } catch (error) {
+      
+    }
+    
+    try {
+      await this.connection?.close();
+    } catch (error) {
+      
+    }
     this.connection = undefined;
     this.session = undefined;
     this.plugin = undefined;
@@ -114,7 +126,6 @@ export class VideoRoom {
     this.plugin = await this.session?.attachPlugin(VideoRoomPlugin.NAME);
 
     this.plugin?.on('event:received', (data: JanusEvent) => {
-      console.log('event:received', data);
       this._onReceiveEvent(data);
     });
     // Event when user accepts permissions.
